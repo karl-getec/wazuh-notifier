@@ -11,7 +11,7 @@ data:
       host: wazuh-indexer
       port: 9200
       username: admin
-      password: SUA_SENHA
+      password: WazuhSecretPassword
       verify_certs: false
 
     polling:
