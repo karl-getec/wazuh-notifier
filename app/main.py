@@ -13,6 +13,31 @@ def main():
     print(f"OpenSearch Host : {config.opensearch['host']}")
     print(f"OpenSearch Port : {config.opensearch['port']}")
 
+    import requests
+
+    print("===== TESTE REQUESTS =====")
+
+    try:
+    
+        r = requests.get(
+            "https://wazuh-indexer:9200",
+            verify=False,
+            auth=(
+                config.opensearch["username"],
+                config.opensearch["password"],
+            ),
+            timeout=10,
+        )
+
+        print(f"Status: {r.status_code}")
+        print(r.text)
+
+    except Exception:
+        import traceback
+        traceback.print_exc()
+
+    print("==========================")
+
     client = OpenSearchClient(config)
 
     alerts = client.get_latest_alerts()
