@@ -1,45 +1,48 @@
 from config import Config
 from opensearch import OpenSearchClient
-from policy import NotificationPolicy
 
 
 def main():
 
+    print("=" * 60)
+    print("Iniciando Wazuh Notifier")
+    print("=" * 60)
+
     config = Config()
+
+    print(f"OpenSearch Host : {config.opensearch['host']}")
+    print(f"OpenSearch Port : {config.opensearch['port']}")
 
     client = OpenSearchClient(config)
 
-    policy = NotificationPolicy(
-        rules=config.notifications["rules"],
-        critical_paths=config.notifications["critical_paths"]
-    )
-
     alerts = client.get_latest_alerts()
 
-    print("=" * 70)
+    print()
     print(f"{len(alerts)} alertas encontrados")
-    print("=" * 70)
+    print()
 
     for alert in alerts:
 
-        source = alert.get("_source", {})
+        source = alert["_source"]
+
+        print("=" * 60)
+
+        print(f"Timestamp : {source.get('timestamp')}")
 
         rule = source.get("rule", {})
-        syscheck = source.get("syscheck", {})
+        print(f"Rule      : {rule.get('id')}")
+        print(f"Descrição : {rule.get('description')}")
+
         agent = source.get("agent", {})
+        print(f"Agente    : {agent.get('name')}")
 
-        print()
+        syscheck = source.get("syscheck")
 
-        print(f"Data.......: {source.get('timestamp')}")
-        print(f"Rule.......: {rule.get('id')}")
-        print(f"Descrição..: {rule.get('description')}")
-        print(f"Agente.....: {agent.get('name', '-')}")
-        print(f"Arquivo....: {syscheck.get('path', '-')}")
+        if syscheck:
+            print(f"Arquivo   : {syscheck.get('path')}")
 
-        if policy.should_notify(alert):
-            print(">>> ALERTA CRÍTICO - Enviar e-mail <<<")
-
-        print("-" * 70)
+    print()
+    print("Finalizado com sucesso.")
 
 
 if __name__ == "__main__":

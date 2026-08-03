@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: wazuh-notifier-config
+  namespace: wazuh-dev
+
+data:
+  app.yaml: |
+    opensearch:
+      host: wazuh-indexer
+      port: 9200
+      username: admin
+      password: SUA_SENHA
+      verify_certs: false
+
+    polling:
+      interval: 30
+
+    notifications:
+      rules:
+        - 553
+
+      critical_paths:
+        - "\\\\fs-p3\\Financeiro"
+
+    smtp:
+      enabled: false
+
+      server: smtp.gmail.com
+      port: 587
+
+      username: ""
+      password: ""
+
+      sender: ""
+
+      recipients: []

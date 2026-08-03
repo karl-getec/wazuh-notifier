@@ -12,7 +12,7 @@ class Config:
         if config_file:
             self.path = Path(config_file)
         else:
-            self.path = Path(__file__).parent.parent / "config.yaml"
+            self.path = Path(__file__).parent.parent / "config" / "app.yaml"
 
         if not self.path.exists():
             raise FileNotFoundError(
@@ -21,6 +21,39 @@ class Config:
 
         with open(self.path, "r", encoding="utf-8") as file:
             self.data = yaml.safe_load(file)
+
+        self._load_environment()
+
+    def _load_environment(self):
+
+        opensearch = self.data.setdefault("opensearch", {})
+
+        opensearch["host"] = os.getenv(
+            "OPENSEARCH_HOST",
+            opensearch.get("host")
+        )
+
+        opensearch["port"] = int(
+            os.getenv(
+                "OPENSEARCH_PORT",
+                opensearch.get("port", 9200)
+            )
+        )
+
+        opensearch["username"] = os.getenv(
+            "OPENSEARCH_USERNAME",
+            opensearch.get("username")
+        )
+
+        opensearch["password"] = os.getenv(
+            "OPENSEARCH_PASSWORD",
+            opensearch.get("password")
+        )
+
+        verify = os.getenv("OPENSEARCH_VERIFY_CERTS")
+
+        if verify is not None:
+            opensearch["verify_certs"] = verify.lower() == "true"
 
     @property
     def opensearch(self):

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: wazuh-notifier
+  namespace: wazuh-dev
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: wazuh-notifier
+
+  template:
+    metadata:
+      labels:
+        app: wazuh-notifier
+
+    spec:
+      containers:
+
+        - name: wazuh-notifier
+
+          image: ghcr.io/karl-getec/wazuh-notifier:latest
+          imagePullPolicy: Always
+
+          command:
+            - python
+            - app/main.py
+
+          env:
+            - name: CONFIG_FILE
+              value: /config/app.yaml
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+
+      volumes:
+        - name: config
+          configMap:
+            name: wazuh-notifier-config
