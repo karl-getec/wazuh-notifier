@@ -7,13 +7,19 @@ class OpenSearchClient:
     def __init__(self, config: Config):
 
         self.client = OpenSearch(
-            hosts=[config.opensearch["host"]],
+            hosts=[
+                {
+                    "host": config.opensearch["host"],
+                    "port": config.opensearch["port"],
+                    "scheme": "https"
+                }
+            ],
             http_auth=(
                 config.opensearch["username"],
                 config.opensearch["password"]
             ),
-            use_ssl=config.opensearch["host"].startswith("https"),
-            verify_certs=config.opensearch.get("verify_ssl", False),
+            use_ssl=True,
+            verify_certs=config.opensearch.get("verify_certs", False),
             ssl_show_warn=False
         )
 
