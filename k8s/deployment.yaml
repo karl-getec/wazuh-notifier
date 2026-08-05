@@ -25,10 +25,6 @@ spec:
           image: ghcr.io/karl-getec/wazuh-notifier:latest
           imagePullPolicy: Always
 
-          command:
-            - python
-            - app/main.py
-
           env:
             - name: CONFIG_FILE
               value: /config/app.yaml
