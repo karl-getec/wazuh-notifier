@@ -16,13 +16,15 @@ notifications:
     - "\\\\fs-p3\\Financeiro"
 
 smtp:
-  enabled: false
+  enabled: true
 
-  server: smtp.gmail.com
+  host: smtp.gmail.com
   port: 587
 
-  username: ""
-  password: ""
+  username: "karl.richard@getecinformatica.com.br"
+  password: "inms sxwh ubnc oroh"
 
-  sender: ""
-  recipients: []
+  sender: "alerts@getecinformatica.com.br"
+  recipients:
+    - karl.richard@getecinformatica.com.br
+    - andreluizsalata@gmail.com

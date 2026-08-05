@@ -55,6 +55,42 @@ class Config:
         if verify is not None:
             opensearch["verify_certs"] = verify.lower() == "true"
 
+        smtp = self.data.setdefault("smtp", {})
+
+        smtp["host"] = os.getenv(
+            "SMTP_HOST",
+            smtp.get("host")
+        )
+
+        smtp["port"] = int(
+            os.getenv(
+                "SMTP_PORT",
+                smtp.get("port", 587)
+            )
+        )
+
+        smtp["username"] = os.getenv(
+            "SMTP_USERNAME",
+            smtp.get("username")
+        )
+
+        smtp["password"] = os.getenv(
+            "SMTP_PASSWORD",
+            smtp.get("password")
+        )
+
+        smtp["enabled"] = os.getenv(
+            "SMTP_ENABLED",
+            str(smtp.get("enabled", False))
+        ).lower() == "true"
+
+        smtp["sender"] = os.getenv(
+            "SMTP_SENDER",
+            smtp.get("sender")
+        )
+
+        smtp["recipients"] = smtp.get("recipients", [])
+
     @property
     def opensearch(self):
         return self.data.get("opensearch", {})
@@ -66,3 +102,7 @@ class Config:
     @property
     def notifications(self):
         return self.data.get("notifications", {})
+
+    @property
+    def smtp(self):
+        return self.data.get("smtp", {})
