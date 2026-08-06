@@ -1,5 +1,8 @@
+from datetime import datetime, timedelta, timezone
+
 from config import Config
 from opensearch import OpenSearchClient
+from mail import MailClient
 
 
 def main():
@@ -14,8 +17,14 @@ def main():
     print(f"OpenSearch Port : {config.opensearch['port']}")
 
     client = OpenSearchClient(config)
+    mail = MailClient(config)
 
-    alerts = client.get_latest_alerts()
+    timestamp = (
+        datetime.now(timezone.utc)
+        - timedelta(minutes=config.polling["interval"])
+    ).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+    alerts = client.get_alerts_since(timestamp)
 
     print()
     print(f"{len(alerts)} alertas encontrados")
@@ -25,21 +34,34 @@ def main():
 
         source = alert["_source"]
 
+        rule = source.get("rule", {})
+        agent = source.get("agent", {})
+        syscheck = source.get("syscheck", {})
+
         print("=" * 60)
 
         print(f"Timestamp : {source.get('timestamp')}")
-
-        rule = source.get("rule", {})
         print(f"Rule      : {rule.get('id')}")
         print(f"Descrição : {rule.get('description')}")
-
-        agent = source.get("agent", {})
         print(f"Agente    : {agent.get('name')}")
-
-        syscheck = source.get("syscheck")
 
         if syscheck:
             print(f"Arquivo   : {syscheck.get('path')}")
+
+        subject = f"Wazuh Alert - Rule {rule.get('id')}"
+
+        body = f"""
+Timestamp : {source.get('timestamp')}
+
+Rule      : {rule.get('id')}
+Descrição : {rule.get('description')}
+
+Agente    : {agent.get('name')}
+
+Arquivo   : {syscheck.get('path')}
+"""
+
+        mail.send(subject, body)
 
     print()
     print("Finalizado com sucesso.")

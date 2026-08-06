@@ -1,7 +1,6 @@
 from opensearchpy import OpenSearch
 from config import Config
 
-
 class OpenSearchClient:
 
     def __init__(self, config: Config):
@@ -36,6 +35,33 @@ class OpenSearchClient:
             ],
             "query": {
                 "match_all": {}
+            }
+        }
+
+        response = self.client.search(
+            index="wazuh-alerts-*",
+            body=query
+        )
+
+        return response["hits"]["hits"]
+
+    def get_alerts_since(self, timestamp: str):
+
+        query = {
+            "size": 1000,
+            "sort": [
+                {
+                    "timestamp": {
+                        "order": "asc"
+                    }
+                }
+            ],
+            "query": {
+                "range": {
+                    "timestamp": {
+                        "gte": timestamp
+                    }
+                }
             }
         }
 

@@ -6,14 +6,14 @@ opensearch:
   verify_certs: false
 
 polling:
-  interval: 30
+  interval: 60
 
 notifications:
   rules:
     - 553
 
   critical_paths:
-    - "\\\\fs-p3\\Financeiro"
+    - "C:\\Users\\Karl\\Documents\\Documents\\TesteWazuh"
 
 smtp:
   enabled: true
