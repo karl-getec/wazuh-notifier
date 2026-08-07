@@ -65,8 +65,6 @@ class OpenSearchClient:
             }
         }
 
-        print(query)
-
         response = self.client.search(
             index="wazuh-alerts-*",
             body=query
