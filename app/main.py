@@ -42,10 +42,10 @@ def main():
         agent = source.get("agent", {})
         syscheck = source.get("syscheck", {})
 
-        rule_id = rule.get("id")
+        rule_id = int(rule.get("id", 0))
 
-    if notification_rules and rule_id not in notification_rules:
-        continue
+        if notification_rules and rule_id not in notification_rules:
+            continue
 
         print("=" * 60)
 
