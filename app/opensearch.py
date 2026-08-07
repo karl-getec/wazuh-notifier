@@ -1,5 +1,13 @@
+from time import sleep
+
 from opensearchpy import OpenSearch
+from opensearchpy.exceptions import ConnectionError
+
 from config import Config
+
+MAX_RETRIES = 3
+RETRY_DELAY = 3
+
 
 class OpenSearchClient:
 
@@ -65,9 +73,26 @@ class OpenSearchClient:
             }
         }
 
-        response = self.client.search(
-            index="wazuh-alerts-*",
-            body=query
-        )
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                response = self.client.search(
+                    index="wazuh-alerts-*",
+                    body=query
+                )
 
-        return response["hits"]["hits"]
+                return response["hits"]["hits"]
+
+            except ConnectionError as error:
+
+                print(
+                    f"Falha ao conectar ao OpenSearch "
+                    f"(tentativa {attempt}/{MAX_RETRIES}). "
+                    f"{error}"
+                )
+
+                if attempt == MAX_RETRIES:
+                    raise
+
+                print(f"Nova tentativa em {RETRY_DELAY} segundos...")
+
+                sleep(RETRY_DELAY)
