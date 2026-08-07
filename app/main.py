@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta, timezone
 
 from config import Config
-from opensearch import OpenSearchClient
 from mail import MailClient
+from opensearch import OpenSearchClient
+from policy import NotificationPolicy
 
 
 def main():
@@ -13,20 +14,16 @@ def main():
 
     config = Config()
 
-    notification_rules = set(
-        config.notifications.get("rules", [])
-    )
-
-    critical_paths = [
-        path.lower()
-        for path in config.notifications.get("critical_paths", [])
-    ]
-
     print(f"OpenSearch Host : {config.opensearch['host']}")
     print(f"OpenSearch Port : {config.opensearch['port']}")
 
     client = OpenSearchClient(config)
     mail = MailClient(config)
+
+    policy = NotificationPolicy(
+        rules=config.notifications.get("rules", []),
+        critical_paths=config.notifications.get("critical_paths", [])
+    )
 
     timestamp = (
         datetime.now(timezone.utc)
@@ -41,25 +38,14 @@ def main():
 
     for alert in alerts:
 
+        if not policy.should_notify(alert):
+            continue
+
         source = alert["_source"]
 
         rule = source.get("rule", {})
         agent = source.get("agent", {})
         syscheck = source.get("syscheck", {})
-
-        rule_id = int(rule.get("id", 0))
-
-        if notification_rules and rule_id not in notification_rules:
-            continue
-
-        path = syscheck.get("path", "").lower()
-
-        if critical_paths:
-            if not any(
-                path.startswith(critical_path)
-                for critical_path in critical_paths
-            ):
-                continue
 
         print("=" * 60)
 
