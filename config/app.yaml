@@ -13,7 +13,7 @@ notifications:
     - 553
 
   critical_paths:
-    - "C:\\Users\\Karl\\Documents\\Documents\\TesteWazuh"
+    - "C:\\Users\\Karl\\Documents\\TesteWazuh"
 
 smtp:
   enabled: true
