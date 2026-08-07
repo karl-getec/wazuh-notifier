@@ -13,6 +13,10 @@ def main():
 
     config = Config()
 
+    notification_rules = set(
+        config.notifications.get("rules", [])
+    )
+
     print(f"OpenSearch Host : {config.opensearch['host']}")
     print(f"OpenSearch Port : {config.opensearch['port']}")
 
@@ -37,6 +41,11 @@ def main():
         rule = source.get("rule", {})
         agent = source.get("agent", {})
         syscheck = source.get("syscheck", {})
+
+        rule_id = rule.get("id")
+
+    if notification_rules and rule_id not in notification_rules:
+        continue
 
         print("=" * 60)
 
