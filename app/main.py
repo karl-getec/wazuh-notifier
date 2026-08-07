@@ -17,6 +17,11 @@ def main():
         config.notifications.get("rules", [])
     )
 
+    critical_paths = [
+        path.lower()
+        for path in config.notifications.get("critical_paths", [])
+    ]
+
     print(f"OpenSearch Host : {config.opensearch['host']}")
     print(f"OpenSearch Port : {config.opensearch['port']}")
 
@@ -46,6 +51,15 @@ def main():
 
         if notification_rules and rule_id not in notification_rules:
             continue
+
+        path = syscheck.get("path", "").lower()
+
+        if critical_paths:
+            if not any(
+                path.startswith(critical_path)
+                for critical_path in critical_paths
+            ):
+                continue
 
         print("=" * 60)
 
