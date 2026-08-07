@@ -49,10 +49,16 @@ def main():
 
         rule_id = int(rule.get("id", 0))
 
+        print(f"DEBUG Rule: {rule_id}")
+        print(f"DEBUG Path: {syscheck.get('path', '')}")
+
         if notification_rules and rule_id not in notification_rules:
             continue
 
         path = syscheck.get("path", "").lower()
+
+        print(f"DEBUG Critical Paths: {critical_paths}")
+        print(f"DEBUG Current Path : {path}")
 
         if critical_paths:
             if not any(
